@@ -28,7 +28,7 @@
       }
 
       async function fetchData() {
-        const response = await fetch('https://urlapi.com/test');
+        const response = await fetch('https://api.github.com/repos/imtomjorge/5MCSI_Metriques/commits');
         const commits = await response.json();
         const commitCountPerDateTime = {};
 
