@@ -6,35 +6,53 @@
   </head>
   <body>
     <div id="chart_div"></div>
-    <script>
-      google.charts.load('current', { packages: ['corechart'] });
-      google.charts.setOnLoadCallback(drawBackgroundColor);
-     function drawBackgroundColor() {
-    function drawChart(data) {
-    // Convertir les données récupérées en un tableau utilisable par Google Charts
-    var dataTable = new google.visualization.DataTable();
-    dataTable.addColumn('string', 'Date');
-    dataTable.addColumn('number', 'Valeur');
+<script>
+  google.charts.load('current', {packages: ['corechart']});
+  google.charts.setOnLoadCallback(drawBackgroundColor);
+
+  function drawBackgroundColor() {
+    fetch('/paris/')
+      .then(response => response.json())
+      .then(data => {
+        drawChart(data);
+      });
+  }
+
+  function drawChart(data) {
+    var dataArray = [['Date', 'Température', {role: 'style'}]];
+    
+    // Modifier cette partie pour adapter les couleurs en fonction de vos besoins
     data.results.forEach(entry => {
       var date = new Date(entry.Jour * 1000);
-      dataTable.addRow([date.toLocaleDateString(), entry.temp]);
+      var color = 'color: ' + getColorForTemperature(entry.temp); // Fonction pour définir la couleur en fonction de la température
+      dataArray.push([date.toLocaleDateString(), entry.temp, color]);
     });
-    // Configurer les options du graphique en ligne
+
+    var dataTable = google.visualization.arrayToDataTable(dataArray);
+
     var options = {
       title: 'Évolution des températures de Paris pour les 16 prochains jours',
-      curveType: 'function',
-      legend: { position: 'bottom' }
+      legend: {position: 'bottom'},
+      bars: 'horizontal' // Required for Material Bar Charts.
     };
-    var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+    var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
     chart.draw(dataTable, options);
   }
-  // Récupération de données depuis notre API /paris/
-  fetch('/paris/')
-    .then(response => response.json())
-    .then(data => {
-      drawChart(data);
-    })
-}
-    </script>
+
+  // Exemple de fonction pour déterminer la couleur en fonction de la température
+  function getColorForTemperature(temp) {
+    if(temp < 0) {
+      return '#1E90FF'; // Bleu pour les températures froides
+    } else if(temp >= 0 && temp < 20) {
+      return '#FFD700'; // Jaune pour les températures modérées
+    } else {
+      return '#FF4500'; // Rouge pour les températures chaudes
+    }
+  }
+</script>
+
   </body>
 </html>
+
+
