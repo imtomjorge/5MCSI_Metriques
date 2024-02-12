@@ -17,59 +17,63 @@ body {
   <body>
     <div id="chart_div"></div>
 <script>
-  google.charts.load('current', {packages: ['corechart']});
-  google.charts.setOnLoadCallback(drawBackgroundColor);
+google.charts.load('current', {packages: ['corechart']});
+google.charts.setOnLoadCallback(drawBackgroundColor);
 
-  function drawBackgroundColor() {
-    fetch('/paris/')
-      .then(response => response.json())
-      .then(data => {
-        drawChart(data);
-      });
-  }
-
-  function drawChart(data) {
-    // Ajout d'une colonne supplémentaire pour les annotations
-    var dataArray = [['Date', 'Température', {role: 'style'}, {role: 'annotation'}]];
-
-    data.results.forEach(entry => {
-      var date = new Date(entry.Jour * 1000);
-      var color = 'color: ' + getColorForTemperature(entry.temp);
-      var annotation = date.toLocaleDateString(); // Utiliser la date comme annotation
-      dataArray.push([date.toLocaleDateString(), entry.temp, color, annotation]);
+function drawBackgroundColor() {
+  fetch('/paris/')
+    .then(response => response.json())
+    .then(data => {
+      drawChart(data);
     });
+}
 
-    var dataTable = google.visualization.arrayToDataTable(dataArray);
+function drawChart(data) {
+  // Création du tableau de données avec une colonne supplémentaire pour les annotations
+  var dataArray = [['Date', 'Température', {role: 'style'}, {role: 'annotation'}]];
 
-    var options = {
-      title: 'Évolution des températures de Paris pour les 16 prochains jours',
-      legend: {position: 'none'},
-      hAxis: {title: 'Date'},
-      vAxis: {title: 'Température'},
-      annotations: {
-        alwaysOutside: true, // Assure que les annotations sont toujours affichées à l'extérieur des barres
-        textStyle: {
-          fontSize: 12, // Vous pouvez ajuster la taille de police ici
-          color: '#000', // Et la couleur du texte des annotations
-          auraColor: 'none' // Désactive l'arrière-plan des annotations
-        }
+  // Ajout des données dans le tableau dataArray
+  data.results.forEach(entry => {
+    var date = new Date(entry.Jour * 1000); // Conversion de la date Unix en objet Date
+    var color = 'color: ' + getColorForTemperature(entry.temp); // Attribution de la couleur
+    var annotation = date.toLocaleDateString(); // Formatage de la date pour l'annotation
+    dataArray.push([date.toLocaleDateString(), entry.temp, color, annotation]);
+  });
+
+  // Conversion du tableau en DataTable de Google Charts
+  var dataTable = google.visualization.arrayToDataTable(dataArray);
+
+  // Configuration des options du graphique
+  var options = {
+    title: 'Évolution des températures de Paris pour les 16 prochains jours',
+    legend: {position: 'none'}, // Pas de légende
+    hAxis: {title: 'Date'}, // Axe des abscisses : Date
+    vAxis: {title: 'Température'}, // Axe des ordonnées : Température
+    annotations: {
+      alwaysOutside: true, // Les annotations sont affichées à l'extérieur des colonnes
+      textStyle: {
+        fontSize: 12, // Taille de la police pour les annotations
+        color: '#000', // Couleur du texte des annotations
+        auraColor: 'none' // Pas d'arrière-plan pour les annotations
       }
-    };
-
-    var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-    chart.draw(dataTable, options);
-  }
-
-  // Exemple de fonction pour déterminer la couleur en fonction de la température
-  function getColorForTemperature(temp) {
-    if(temp < 0) {
-      return '#1E90FF'; // Bleu pour les températures froides
-    } else if(temp >= 0 && temp < 20) {
-      return '#FFD700'; // Jaune pour les températures modérées
-    } else {
-      return '#FF4500'; // Rouge pour les températures chaudes
     }
+  };
+
+  // Création et dessin du graphique dans l'élément avec l'id 'chart_div'
+  var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+  chart.draw(dataTable, options);
+}
+
+// Fonction pour déterminer la couleur en fonction de la température
+function getColorForTemperature(temp) {
+  if(temp < 0) {
+    return '#1E90FF'; // Bleu pour les températures froides
+  } else if(temp >= 0 && temp < 20) {
+    return '#FFD700'; // Jaune pour les températures modérées
+  } else {
+    return '#FF4500'; // Rouge pour les températures chaudes
   }
+}
 </script>
 
 
