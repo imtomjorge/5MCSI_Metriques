@@ -32,11 +32,16 @@
 
     var options = {
       title: 'Évolution des températures de Paris pour les 16 prochains jours',
-      legend: {position: 'bottom'},
-      bars: 'horizontal' // Required for Material Bar Charts.
+      legend: {position: 'none'}, // Ajuster si nécessaire
+      hAxis: {
+        title: 'Date',
+      },
+      vAxis: {
+        title: 'Température',
+      },
     };
 
-    var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+    var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
     chart.draw(dataTable, options);
   }
 
@@ -51,6 +56,7 @@
     }
   }
 </script>
+
 
   </body>
 </html>
